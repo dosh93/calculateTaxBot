@@ -1,0 +1,17 @@
+fixer:
+  token: Ez1Mu5ZKqd160TL8DEsKXduJWE8OcpiY
+  url: https://api.apilayer.com/fixer/latest?base=USD&symbols=JPY,RUB
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: always

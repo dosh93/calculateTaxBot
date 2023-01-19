@@ -1,0 +1,15 @@
+bot:
+  name: Motojapan_bot
+  token: 5970223907:AAFwM_Y3bkEFRDCTVgOMTkdHAT_WvuKfYQI
+
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/bot
+    username: bot_usr
+    password: zss43rDvI1RuJTdW
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false

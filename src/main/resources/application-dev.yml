@@ -1,0 +1,14 @@
+bot:
+  name: bot2_rmatyu_bot
+  token: 5657456423:AAGhUc-pLILGrdmhCAA3F6i7OVnINbitvlE
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/cal_tax
+    username: root
+    password: a2jcyccz4
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
