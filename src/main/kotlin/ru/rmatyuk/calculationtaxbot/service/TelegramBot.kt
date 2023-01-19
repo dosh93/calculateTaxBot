@@ -18,6 +18,7 @@ import ru.rmatyuk.calculationtaxbot.design.MessageText
 import ru.rmatyuk.calculationtaxbot.enums.CallbackButton
 import ru.rmatyuk.calculationtaxbot.enums.StateUser
 import ru.rmatyuk.calculationtaxbot.model.User
+import kotlin.concurrent.thread
 
 @Component
 class TelegramBot(config: BotConfig, userController: UserController, calculateController: CalculateController,
@@ -46,63 +47,65 @@ class TelegramBot(config: BotConfig, userController: UserController, calculateCo
     }
 
     override fun onUpdateReceived(update: Update?) {
-        if (update != null && update.hasMessage() && update.message.hasText()) {
-            val message = update.message
-            val replyKeyboardMarkup = ReplyKeyboardMarkup()
-            replyKeyboardMarkup.resizeKeyboard = true
-            replyKeyboardMarkup.oneTimeKeyboard = true
+        thread {
+            if (update != null && update.hasMessage() && update.message.hasText()) {
+                val message = update.message
+                val replyKeyboardMarkup = ReplyKeyboardMarkup()
+                replyKeyboardMarkup.resizeKeyboard = true
+                replyKeyboardMarkup.oneTimeKeyboard = true
 
-            if (message.text == "/start") {
+                if (message.text == "/start") {
+                    val inlineKeyboardMarkup = InlineKeyboardMarkup()
+                    userController.register(message.chatId)
+                    inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.start()))
+                    sendMessage(message.chatId, MessageText.startMessage, inlineKeyboardMarkup)
+
+                } else {
+                    val user = userController.getUser(message.chatId)
+                    val userState = user.state!!
+                    if (userState == StateUser.BID_AUCTION) {
+                        processBidAuction(message, user)
+                    } else if (userState == StateUser.YEAR) {
+                        processYear(message, user)
+                    } else if (userState == StateUser.POWER) {
+                        processPower(message, user)
+                    } else if (userState == StateUser.HOW_MACH_HORSE) {
+                        processHorse(message, user)
+                    }
+                }
+            } else if (update != null && update.hasCallbackQuery()) {
+                val callback = CallbackButton.valueOf(update.callbackQuery.data)
+                val chatId = update.callbackQuery.message.chatId
+                var user = userController.getUser(chatId)
                 val inlineKeyboardMarkup = InlineKeyboardMarkup()
-                userController.register(message.chatId)
-                inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.start()))
-                sendMessage(message.chatId, MessageText.startMessage, inlineKeyboardMarkup)
+                when (callback) {
+                    CallbackButton.START, CallbackButton.RESUME -> {
+                        userController.setState(user, StateUser.BID_AUCTION)
+                        inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.whatRate()), listOf(Buttons.help()))
+                        sendMessage(chatId, MessageText.bidAuction, inlineKeyboardMarkup)
+                    }
 
-            } else {
-                val user = userController.getUser(message.chatId)
-                val userState = user.state!!
-                if (userState == StateUser.BID_AUCTION) {
-                    processBidAuction(message, user)
-                } else if (userState == StateUser.YEAR) {
-                    processYear(message, user)
-                } else if (userState == StateUser.POWER) {
-                    processPower(message, user)
-                } else if (userState == StateUser.HOW_MACH_HORSE) {
-                    processHorse(message, user)
-                }
-            }
-        } else if (update != null && update.hasCallbackQuery()) {
-            val callback = CallbackButton.valueOf(update.callbackQuery.data)
-            val chatId = update.callbackQuery.message.chatId
-            var user = userController.getUser(chatId)
-            val inlineKeyboardMarkup = InlineKeyboardMarkup()
-            when (callback) {
-                CallbackButton.START, CallbackButton.RESUME -> {
-                    userController.setState(user, StateUser.BID_AUCTION)
-                    inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.whatRate()), listOf(Buttons.help()))
-                    sendMessage(chatId, MessageText.bidAuction, inlineKeyboardMarkup)
-                }
+                    CallbackButton.WHAT_RATE -> {
+                        inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.resume()), listOf(Buttons.help()))
+                        sendMessage(chatId, MessageText.whatRate, inlineKeyboardMarkup)
+                    }
 
-                CallbackButton.WHAT_RATE -> {
-                    inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.resume()), listOf(Buttons.help()))
-                    sendMessage(chatId, MessageText.whatRate, inlineKeyboardMarkup)
-                }
+                    CallbackButton.YES -> {
+                        userController.setState(user, StateUser.HOW_MACH_HORSE)
+                        inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.whatExciseDuty()), listOf(Buttons.help()))
+                        sendMessage(chatId, MessageText.howManyHorse, inlineKeyboardMarkup)
+                    }
 
-                CallbackButton.YES -> {
-                    userController.setState(user, StateUser.HOW_MACH_HORSE)
-                    inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.whatExciseDuty()), listOf(Buttons.help()))
-                    sendMessage(chatId, MessageText.howManyHorse, inlineKeyboardMarkup)
-                }
+                    CallbackButton.NO -> {
+                        user = userController.setHorse(user, 0)
+                        inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.tg(), Buttons.wa(), Buttons.vk(), Buttons.avito()), listOf(Buttons.recount()))
+                        sendMessage(chatId, getMessageCalculate(user, calculateController.getCalculate(user)), inlineKeyboardMarkup)
+                    }
 
-                CallbackButton.NO -> {
-                    user = userController.setHorse(user, 0)
-                    inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.tg(), Buttons.wa(), Buttons.vk(), Buttons.avito()), listOf(Buttons.recount()))
-                    sendMessage(chatId, getMessageCalculate(user, calculateController.getCalculate(user)), inlineKeyboardMarkup)
-                }
-
-                CallbackButton.WHAT_EXCISE_DUTY -> {
-                    inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.whatExciseDuty()), listOf(Buttons.help()))
-                    sendMessage(chatId, "${MessageText.exciseDuty}\n\n${MessageText.howManyHorse}", inlineKeyboardMarkup)
+                    CallbackButton.WHAT_EXCISE_DUTY -> {
+                        inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.whatExciseDuty()), listOf(Buttons.help()))
+                        sendMessage(chatId, "${MessageText.exciseDuty}\n\n${MessageText.howManyHorse}", inlineKeyboardMarkup)
+                    }
                 }
             }
         }
