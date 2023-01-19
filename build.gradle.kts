@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+	implementation("org.glassfish.expressly:expressly:5.0.0")
 	implementation("org.hibernate.validator:hibernate-validator:8.0.0.Final")
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 	implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.7.0")
@@ -39,4 +40,8 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.named("jar") {
+	enabled = false
 }
