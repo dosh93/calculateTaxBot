@@ -1,19 +1,15 @@
 package ru.rmatyuk.calculationtaxbot.utils
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.io.ResourceLoader
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
+import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
+import java.io.File
+import java.util.*
 
 @Component
-class CsvUtils(resourceLoader: ResourceLoader) {
-
-    @Autowired
-    private lateinit var resourceLoader: ResourceLoader
-
-    init {
-        this.resourceLoader = resourceLoader
-    }
+class CsvUtils() {
 
     fun readPowerYear(): List<List<String>> {
         val file = load("csv/bid_year.csv")
@@ -26,7 +22,15 @@ class CsvUtils(resourceLoader: ResourceLoader) {
     }
 
     fun load(path: String): String {
-        return resourceLoader.getResource("classpath:$path").file
-                .readText(charset = Charsets.UTF_8)
+        val classPathResource = ClassPathResource(path)
+
+        val inputStream = classPathResource.inputStream
+        val tmpFile = File.createTempFile(UUID.randomUUID().toString(), ".csv")
+        try {
+            FileUtils.copyInputStreamToFile(inputStream, tmpFile)
+        } finally {
+            IOUtils.close(inputStream)
+        }
+        return tmpFile.readText(charset = Charsets.UTF_8)
     }
 }

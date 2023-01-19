@@ -45,3 +45,7 @@ tasks.withType<Test> {
 tasks.named("jar") {
 	enabled = false
 }
+
+springBoot {
+	mainClass.set("ru.rmatyuk.calculationtaxbot.CalculationTaxBotApplication")
+}
