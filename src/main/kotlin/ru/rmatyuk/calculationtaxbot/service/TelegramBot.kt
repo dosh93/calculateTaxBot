@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton
 import ru.rmatyuk.calculationtaxbot.config.BotConfig
 import ru.rmatyuk.calculationtaxbot.controller.CalculateController
 import ru.rmatyuk.calculationtaxbot.controller.ExchangeRateController
@@ -18,6 +19,7 @@ import ru.rmatyuk.calculationtaxbot.design.MessageText
 import ru.rmatyuk.calculationtaxbot.enums.CallbackButton
 import ru.rmatyuk.calculationtaxbot.enums.StateUser
 import ru.rmatyuk.calculationtaxbot.model.User
+import java.util.Scanner
 import kotlin.concurrent.thread
 
 @Component
@@ -71,6 +73,8 @@ class TelegramBot(config: BotConfig, userController: UserController, calculateCo
                         processPower(message, user)
                     } else if (userState == StateUser.HOW_MACH_HORSE) {
                         processHorse(message, user)
+                    } else if (userState == StateUser.HORSE) {
+                        processChoseHorse(message, user)
                     }
                 }
             } else if (update != null && update.hasCallbackQuery()) {
@@ -98,7 +102,7 @@ class TelegramBot(config: BotConfig, userController: UserController, calculateCo
 
                     CallbackButton.NO -> {
                         user = userController.setHorse(user, 0)
-                        inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.tg(), Buttons.wa(), Buttons.vk(), Buttons.avito()), listOf(Buttons.recount()))
+                        inlineKeyboardMarkup.keyboard = getKeyboardFinal()
                         sendMessage(chatId, getMessageCalculate(user, calculateController.getCalculate(user)), inlineKeyboardMarkup)
                     }
 
@@ -171,9 +175,16 @@ class TelegramBot(config: BotConfig, userController: UserController, calculateCo
             MessageText.howManyHorse
         } else {
             val user = userController.setHorse(user, horse)
-            inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.tg(), Buttons.wa(), Buttons.vk(), Buttons.avito()), listOf(Buttons.recount()))
+            inlineKeyboardMarkup.keyboard = getKeyboardFinal()
             getMessageCalculate(user, calculateController.getCalculate(user))
         }
+        sendMessage(message.chatId, messageText, inlineKeyboardMarkup)
+    }
+
+    private fun processChoseHorse(message: Message, user: User) {
+        val inlineKeyboardMarkup = InlineKeyboardMarkup()
+        inlineKeyboardMarkup.keyboard = listOf(listOf(Buttons.yes(), Buttons.no()), listOf(Buttons.help()))
+        val messageText = MessageText.needPressButton + MessageText.horse
         sendMessage(message.chatId, messageText, inlineKeyboardMarkup)
     }
 
@@ -188,5 +199,9 @@ class TelegramBot(config: BotConfig, userController: UserController, calculateCo
         messageSend.text = message
         if (keyboard != null) messageSend.replyMarkup = keyboard
         execute(messageSend)
+    }
+
+    private fun getKeyboardFinal(): List<List<InlineKeyboardButton>> {
+        return listOf(listOf(Buttons.tg(), Buttons.wa()), listOf(Buttons.vk()), listOf(Buttons.avito()), listOf(Buttons.recount()))
     }
 }

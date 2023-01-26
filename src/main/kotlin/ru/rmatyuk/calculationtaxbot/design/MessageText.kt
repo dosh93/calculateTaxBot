@@ -32,6 +32,9 @@ class MessageText {
                 "150 л.с. С 2023 года он составляет 554₽ за 1 л.с."
 
         @JvmStatic
+        val needPressButton = "Нужно нажать кнопку.\n\n"
+
+        @JvmStatic
         val calculate = "<b>Цена в Москве под ключ: %d рублей</b>\n" +
                 "Год: %d\n" +
                 "Объем двигателя: %d см3\n" +

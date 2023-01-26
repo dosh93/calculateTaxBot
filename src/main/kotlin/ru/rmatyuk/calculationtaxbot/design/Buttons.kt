@@ -17,12 +17,12 @@ class Buttons {
 
         @JvmStatic
         fun whatRate(): InlineKeyboardButton {
-            return createButton("Где взять ставку?", CallbackButton.WHAT_RATE.name)
+            return createButton("Где взять ставку? \uD83E\uDD37\uD83C\uDFFC\u200D♀️", CallbackButton.WHAT_RATE.name)
         }
 
         @JvmStatic
         fun resume(): InlineKeyboardButton {
-            return createButton("продолжить считать", CallbackButton.RESUME.name)
+            return createButton("Продолжить считать ▶️", CallbackButton.RESUME.name)
         }
 
         @JvmStatic
@@ -38,42 +38,42 @@ class Buttons {
 
         @JvmStatic
         fun no(): InlineKeyboardButton {
-            return createButton("Нет", CallbackButton.NO.name)
+            return createButton("Нет ❌", CallbackButton.NO.name)
         }
 
         @JvmStatic
         fun yes(): InlineKeyboardButton {
-            return createButton("Да", CallbackButton.YES.name)
+            return createButton("Да ✅", CallbackButton.YES.name)
         }
 
         @JvmStatic
         fun whatExciseDuty(): InlineKeyboardButton {
-            return createButton("что такое акциз?", CallbackButton.WHAT_EXCISE_DUTY.name)
+            return createButton("что такое акциз? \uD83E\uDD37\uD83C\uDFFC\u200D♀️", CallbackButton.WHAT_EXCISE_DUTY.name)
         }
 
         @JvmStatic
         fun vk(): InlineKeyboardButton {
-            return createButton("VK", "","https://vk.com/motojapancom")
+            return createButton("Наше сообщество в ВК \uD83D\uDD35", "","https://vk.com/motojapancom")
         }
 
         @JvmStatic
         fun tg(): InlineKeyboardButton {
-            return createButton("TG", "","T.me/paul375")
+            return createButton("Telegram \uD83D\uDCF2", "","T.me/paul375")
         }
 
         @JvmStatic
         fun wa(): InlineKeyboardButton {
-            return createButton("WhatsApp", "","Wa.me/79774776042")
+            return createButton("WhatsApp \uD83D\uDCAC", "","Wa.me/79774776042")
         }
 
         @JvmStatic
         fun avito(): InlineKeyboardButton {
-            return createButton("Avito", "", "https://www.avito.ru/user/01c57bef5e80d0167670eb9580f9423b/profile?src=sharing")
+            return createButton("Отзывы на авито \uD83D\uDFE2", "", "https://www.avito.ru/user/01c57bef5e80d0167670eb9580f9423b/profile?src=sharing")
         }
 
         @JvmStatic
         fun recount(): InlineKeyboardButton {
-            return createButton("Пересчитать", CallbackButton.RESUME.name)
+            return createButton("Пересчитать \uD83D\uDD04", CallbackButton.RESUME.name)
         }
 
     }
